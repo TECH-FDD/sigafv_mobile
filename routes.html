@@ -340,7 +340,7 @@ function calcRoute() {
                            </span>  
 
                            <div class="tools pull-right mtop7" style="padding-bottom: 3px;">
-                                <div class="btn-group"><a class="btn btn-small element" data-original-title="Presione"  onclick="listUsuario();" role="button"  data-toggle="modal" data-toggle="tooltip" data-placement="top" style="bottom: 3px;">
+                                <div class="btn-group"><a class="btn btn-small element" data-original-title="Presione"  onclick="listDestinos();" role="button"  data-toggle="modal" data-toggle="tooltip" data-placement="top" style="bottom: 3px;">
                                             Todos
                                         </a></div>
 
@@ -374,25 +374,7 @@ function calcRoute() {
                   </div>
                </div>
             </div>
-            <!--<input id="id_input" />
-            <input id="id_input2" />
 
-            <div class="row-fluid">
-               <div class="span12">
-               	
-                  <div class="widget">
-                   
-
-                    <div class="widget-body">
-							   <button   class="input-large" >Obtener coordenada</button>
-							    <input type="submit" class="btn" value="Calcular ruta" onclick="calcRoute();return false;">
-						</div>
-
-
-
-                  </div>
-               </div>
-            </div>-->
             <div class="row-fluid">
                <div class="span12">
                   <div class="widget">
@@ -531,7 +513,7 @@ function calcRoute() {
 		    origin: start,
 		    destination: end,
 		    waypoints: waypoints,
-		    unitSystem: google.maps.UnitSystem.IMPERIAL,
+		    unitSystem: google.maps.UnitSystem.METRIC,
 		    travelMode: google.maps.DirectionsTravelMode[travelMode]
 		  };
 		  directionsService.route(request, function(response, status) {
@@ -559,10 +541,15 @@ function calcRoute() {
 		  });
 		}
 
-		function listUsuario() {
-			var ws = 'datos.php';
+		function listDestinos() {
+
+        var get= window.location.search.substring(1);
+        var id =get.substring(6);
+
+        var URL = "http://localhost/cellar/api/destinos";
+
 		     $.ajax({
-		            url: "http://localhost/cellar/api/wines",
+		            url: URL + '/'+id,
 		            type: 'GET',
 		            dataType: 'json',
 		            contentType: 'application/json',
@@ -616,9 +603,13 @@ function calcRoute() {
     }
 
     function listarVisitados() {
-      var ws = 'datos.php';
+        
+        var get= window.location.search.substring(1);
+        var id =get.substring(6);
+
+        var URL = "http://localhost/cellar/api/visitados";
          $.ajax({
-                url: "http://localhost/cellar/api/visitados",
+                url:  URL + '/'+id,
                 type: 'GET',
                 dataType: 'json',
                 contentType: 'application/json',
@@ -634,16 +625,20 @@ function calcRoute() {
     }
 
     function listarNovisitados() {
-      var ws = 'datos.php';
+
+        var get= window.location.search.substring(1);
+        var id =get.substring(6);
+
+        var URL = "http://localhost/cellar/api/novisitados";
          $.ajax({
-                url: "http://localhost/cellar/api/novisitados",
+                url:  URL + '/'+id,
                 type: 'GET',
                 dataType: 'json',
                 contentType: 'application/json',
                 success: function (response) {
                     var trHTML = '';
                     $.each(response, function (i, item) {
-                        trHTML += '<tr><td>' + item.descripcion + '</td><td>' + item.latitud + '</td><td class="two">' + item.longitud + '</td><td onclick="getValue('+item.latitud+','+item.longitud+')"><a href="#myModal3" role="button"  data-toggle="modal" >Ver ruta</a></td><td><button  class="btn"  onclick="updateEstado('+item.id+');">Visitado</button></td></tr>';
+                        trHTML += '<tr><td>' + item.descripcion + '</td><td>' + item.latitud + '</td><td class="two">' + item.longitud + '</td><td onclick="getValue('+item.latitud+','+item.longitud+')"><a href="#myModal3" role="button"  data-toggle="modal" >Ver ruta</a></td><td><button  class="btn"  onclick="updateEstado('+item.Destino_ID+');">Visitado</button></td></tr>';
                     });
                     $('#tbodyid').empty();
                     $('#sample_1').append(trHTML);
