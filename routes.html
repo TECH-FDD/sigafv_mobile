@@ -328,8 +328,9 @@ function calcRoute() {
           </div>
          <!-- BEGIN PAGE CONTAINER-->
          <div class="container-fluid" style="margin-top: 15px;">
-
+            <!--<button class="btn" onclick="mostrar();" >Mostrar</button>-->
              <div class="row-fluid">
+             
                <div class="span12">
                   <div class="widget">
                         <div class="widget-title" style="border-bottom:1px solid #4E4E4E;background-image:-webkit-linear-gradient(top, #FFFFFF 0%, #A9A9A9 100%);">
@@ -347,7 +348,7 @@ function calcRoute() {
                                                   Visitados
                                               </a></div>
                                 <div class="btn-group"><a class="btn btn-small element" data-original-title="Presione"  onclick="listarNovisitados();" role="button"  data-toggle="modal" data-toggle="tooltip" data-placement="top" style="bottom: 3px;">
-                                            No visitados
+                                            Nuevos
                                         </a></div>
 
                             </div>                 
@@ -361,6 +362,7 @@ function calcRoute() {
                                           <td>Latitud</td>
                                           <td>Longitud</td>
                                           <td>Visualización</td>
+                                          <td>Estado</td>
                                       
                                       </tr>
                                   </thead>
@@ -511,7 +513,7 @@ function calcRoute() {
 		  //var start = $("#id_input").val();
 		  //var via = $("#id_input2").val();
 		  var start = $("#routeStart").val();
-          var via = $("#routeVia").val();
+      var via = $("#routeVia").val();
 		  
 		  if (travelMode == 'TRANSIT') {
 		    via = ''; // if the travel mode is transit, don't use the via waypoint because that will not work
@@ -567,7 +569,15 @@ function calcRoute() {
 		            success: function (response) {
 		                var trHTML = '';
 		                $.each(response, function (i, item) {
-		                    trHTML += '<tr><td>' + item.descripcion + '</td><td>' + item.latitud + '</td><td class="two">' + item.longitud + '</td><td onclick="getValue('+item.latitud+','+item.longitud+')"><a href="#myModal3" role="button"  data-toggle="modal" >Ver ruta</a></td><td onclick="updateEstado('+item.id+')"><a href="#" role="button" >Visitado</a></td></tr>';
+                        var cadena=null;
+
+                        if(item.visitado==true){
+                            cadena = '<label style="font-size:17px;color:#31B404;">Visitado</label>';
+                        }else{
+                            cadena = '<label style="font-size:17px;color:#FE2E2E;">No visitado</label>';
+                        }
+
+		                    trHTML += '<tr><td>' + item.descripcion + '</td><td>' + item.latitud + '</td><td class="two">' + item.longitud + '</td><td onclick="getValue('+item.latitud+','+item.longitud+')"><a href="#myModal3" role="button"  data-toggle="modal" style="font-size:17px;" >Ver ruta</a></td><td>'+cadena+'</td></tr>';
 		                });
 		                $('#tbodyid').empty();
 		                $('#sample_1').append(trHTML);
@@ -576,8 +586,8 @@ function calcRoute() {
 		}
 
     function updateEstado(id) {
-      //console.log('updateWine');
-      var URL = "http://localhost/cellar/api/visitados";
+      console.log('updateEstado');
+      var URL = "http://localhost/cellar/api/estado";
       $.ajax({
         type: 'PUT',
         contentType: 'application/json',
@@ -585,12 +595,24 @@ function calcRoute() {
         dataType: "json",
         data: formToJSON(),
         success: function(data, textStatus, jqXHR){
-          alert('Wine updated successfully');
+          alert('Actualizacion exitosa');
+          listarNovisitados();  
         },
         error: function(jqXHR, textStatus, errorThrown){
-          alert('updateWine error: ' + textStatus);
+          alert('Error al intentar actualizar');
         }
+
       });
+      
+    }
+
+    // Helper function to serialize all the form fields into a JSON string
+    function formToJSON() {
+      return JSON.stringify({
+        //"id": $('#wineId').val(), 
+        "visitado": 'true', 
+       
+        });
     }
 
     function listarVisitados() {
@@ -603,7 +625,7 @@ function calcRoute() {
                 success: function (response) {
                     var trHTML = '';
                     $.each(response, function (i, item) {
-                        trHTML += '<tr><td>' + item.descripcion + '</td><td>' + item.latitud + '</td><td class="two">' + item.longitud + '</td><td onclick="getValue('+item.latitud+','+item.longitud+')"><a href="#myModal3" role="button"  data-toggle="modal" >Ver ruta</a></td></tr>';
+                        trHTML += '<tr><td>' + item.descripcion + '</td><td>' + item.latitud + '</td><td class="two">' + item.longitud + '</td><td onclick="getValue('+item.latitud+','+item.longitud+')"><a style="font-size:17px" href="#myModal3" role="button"  data-toggle="modal" >Ver ruta</a></td><td><label style="font-size:17px;color:#31B404">Visitado</label></td></tr>';
                     });
                     $('#tbodyid').empty();
                     $('#sample_1').append(trHTML);
@@ -621,7 +643,7 @@ function calcRoute() {
                 success: function (response) {
                     var trHTML = '';
                     $.each(response, function (i, item) {
-                        trHTML += '<tr><td>' + item.descripcion + '</td><td>' + item.latitud + '</td><td class="two">' + item.longitud + '</td><td onclick="getValue('+item.latitud+','+item.longitud+')"><a href="#myModal3" role="button"  data-toggle="modal" >Ver ruta</a></td></tr>';
+                        trHTML += '<tr><td>' + item.descripcion + '</td><td>' + item.latitud + '</td><td class="two">' + item.longitud + '</td><td onclick="getValue('+item.latitud+','+item.longitud+')"><a href="#myModal3" role="button"  data-toggle="modal" >Ver ruta</a></td><td><button  class="btn"  onclick="updateEstado('+item.id+');">Visitado</button></td></tr>';
                     });
                     $('#tbodyid').empty();
                     $('#sample_1').append(trHTML);
@@ -630,9 +652,9 @@ function calcRoute() {
     }
 
 
-		setInterval( function () {
+	/*	setInterval( function () {
 		    listUsuario();
-		}, 10000 );
+		}, 10000 );*/
 
 		function getValue(celda1,celda2){
     		var coordenada = celda1+','+celda2;
@@ -640,13 +662,20 @@ function calcRoute() {
 		    $("#routeVia").val(null);
 		}
 
+    function mostrar(){
+        var SearchString = window.location.search.substring(1);
+        var VariableArray = SearchString.substring(6);
+      
+        alert(VariableArray);
+    }
+
 		function newCoordinate()
 		{
 			getValue('','');
 		}
       jQuery(document).ready(function() {  
    
-         listUsuario();  
+         listarNovisitados();  
   
           App.init();
       });
